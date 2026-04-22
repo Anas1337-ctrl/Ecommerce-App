@@ -7,9 +7,11 @@ import { AppFonts } from "../../styles/fonts";
 import { AppColors } from "../../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 const EmptyCart = () => {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
       <MaterialCommunityIcons
@@ -18,13 +20,11 @@ const EmptyCart = () => {
         color={AppColors.primary}
         style={styles.icon}
       />
-      <AppText style={styles.title}>Your Cart Is Empty</AppText>
-      <AppText style={styles.subTitle}>
-        Browse our products and find something you like
-      </AppText>
+      <AppText style={styles.title}>{t("empty_cart_title")}</AppText>
+      <AppText style={styles.subTitle}>{t("empty_cart_subtitle")}</AppText>
       <AppButton
         style={styles.button}
-        title="Start Shopping"
+        title={t("start_shopping")}
         onPress={() => navigation.navigate("Home")}
       />
     </View>

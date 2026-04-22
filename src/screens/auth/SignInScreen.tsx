@@ -17,30 +17,32 @@ import { auth } from "../../config/firebase";
 import { showMessage } from "react-native-flash-message";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../store/reducers/userSlice";
-
-const schema = yup
-  .object({
-    email: yup
-      .string()
-      .required("Email is required")
-      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format")
-      .min(3, "Email must be at least 3 characters"),
-
-    password: yup
-      .string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters"),
-  })
-  .required();
-
-type FormData = yup.InferType<typeof schema>;
+import { useTranslation } from "react-i18next";
 
 const SignInScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+  const schema = yup
+    .object({
+      email: yup
+        .string()
+        .required(t("sign_in_email_required"))
+        .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, t("sign_in_email_invalid"))
+        .min(3, "Email must be at least 3 characters"),
+
+      password: yup
+        .string()
+        .required(t("sign_in_password_required"))
+        .min(8, t("sign_in_password_min_length")),
+    })
+    .required();
+
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
+  type FormData = yup.InferType<typeof schema>;
+
   const onSignInPress = async (formData: FormData) => {
     try {
       const userCredentials = await signInWithEmailAndPassword(
@@ -56,11 +58,11 @@ const SignInScreen = () => {
     } catch (error: any) {
       let errorMessage = "";
       if (error.code === "auth/user-not-found") {
-        errorMessage = "User not found";
+        errorMessage = t("sign_in_error_user_not_found");
       } else if (error.code === "auth/invalid-credential") {
-        errorMessage = "Invalid credentials";
+        errorMessage = t("sign_in_error_invalid_credential");
       } else {
-        errorMessage = "An error occurred during sign-in";
+        errorMessage = t("sign_in_error_default");
       }
 
       showMessage({
@@ -75,18 +77,21 @@ const SignInScreen = () => {
       <AppTextInputController
         control={control}
         name={"email"}
-        placeholder="Email"
+        placeholder={t("sign_in_email_placeholder")}
       />
       <AppTextInputController
         control={control}
         name={"password"}
-        placeholder="Password"
+        placeholder={t("sign_in_password_placeholder")}
         secureTextEntry
       />
       <AppText style={styles.appName}>Smart E-Commerce</AppText>
-      <AppButton title={"Login"} onPress={handleSubmit(onSignInPress)} />
       <AppButton
-        title={"Sign Up"}
+        title={t("sign_in_login_button")}
+        onPress={handleSubmit(onSignInPress)}
+      />
+      <AppButton
+        title={t("sign_in_signup_button")}
         style={styles.registerButton}
         textColor={AppColors.primary}
         onPress={() => navigation.navigate("SignUpScreen")}

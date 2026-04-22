@@ -26,29 +26,32 @@ import { db } from "../../config/firebase";
 import { showMessage } from "react-native-flash-message";
 import { useNavigation } from "@react-navigation/native";
 import { emptyCart } from "../../store/reducers/cartSlice";
-const schema = yup
-  .object({
-    fullName: yup
-      .string()
-      .required("Name is required")
-      .min(3, "Name must be at least 3 characters"),
-
-    phoneNumber: yup
-      .string()
-      .required("Phone number is required")
-      .matches(/^[0-9]+$/, "Must be only digits")
-      .min(10, "Phone number must be at least 10 characters"),
-
-    detailedAddress: yup
-      .string()
-      .required("Address is required")
-      .min(15, "Please provide a detailed address at least 15 characters"),
-  })
-  .required();
-
-type FormData = yup.InferType<typeof schema>;
-
+import { useTranslation } from "react-i18next";
 const CheckoutScreen = () => {
+  const { t } = useTranslation();
+
+  const schema = yup
+    .object({
+      fullName: yup
+        .string()
+        .required(t("checkout_name_required"))
+        .min(3, t("checkout_name_min_length")),
+
+      phoneNumber: yup
+        .string()
+        .required(t("checkout_phone_required"))
+        .matches(/^[0-9]+$/, t("checkout_phone_digits"))
+        .min(10, t("checkout_phone_min_length")),
+
+      detailedAddress: yup
+        .string()
+        .required(t("checkout_address_required"))
+        .min(15, t("checkout_address_min_length")),
+    })
+    .required();
+
+  type FormData = yup.InferType<typeof schema>;
+
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
@@ -77,7 +80,7 @@ const CheckoutScreen = () => {
 
       showMessage({
         type: "success",
-        message: "Order placed successfully!",
+        message: t("checkout_success_message"),
       });
       navigation.goBack();
       dispatch(emptyCart());
@@ -85,7 +88,7 @@ const CheckoutScreen = () => {
       console.error("Error Saving Order", error);
       showMessage({
         type: "danger",
-        message: "Error placing order",
+        message: t("checkout_error_message"),
       });
     }
   };
@@ -96,22 +99,25 @@ const CheckoutScreen = () => {
           <AppTextInputController
             control={control}
             name={"fullName"}
-            placeholder="Full Name"
+            placeholder={t("checkout_fullname_placeholder")}
           />
           <AppTextInputController
             control={control}
             name={"phoneNumber"}
-            placeholder="Phone Number"
+            placeholder={t("checkout_phone_placeholder")}
           />
           <AppTextInputController
             control={control}
             name={"detailedAddress"}
-            placeholder="Detailed Address"
+            placeholder={t("checkout_address_placeholder")}
           />
         </View>
       </View>
       <View style={styles.bottomButtonContainer}>
-        <AppButton title="Confirm" onPress={handleSubmit(saveOrder)} />
+        <AppButton
+          title={t("checkout_confirm_button")}
+          onPress={handleSubmit(saveOrder)}
+        />
       </View>
     </AppSafeView>
   );

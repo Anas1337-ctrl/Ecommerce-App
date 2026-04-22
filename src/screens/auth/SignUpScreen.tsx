@@ -17,32 +17,35 @@ import { auth } from "../../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../../store/reducers/userSlice";
-
-const schema = yup
-  .object({
-    userName: yup
-      .string()
-      .required("Username is required")
-      .min(5, "Username must be 5 characters long"),
-
-    email: yup
-      .string()
-      .required("Email is required")
-      .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email format")
-      .min(3, "Email must be at least 3 characters"),
-
-    password: yup
-      .string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters"),
-  })
-  .required();
-
-type FormData = yup.InferType<typeof schema>;
+import { useTranslation } from "react-i18next";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+
+  const schema = yup
+    .object({
+      userName: yup
+        .string()
+        .required(t("sign_up_username_required"))
+        .min(5, t("sign_up_username_min_length")),
+
+      email: yup
+        .string()
+        .required(t("sign_up_email_required"))
+        .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, t("sign_up_email_invalid"))
+        .min(3, "Email must be at least 3 characters"),
+
+      password: yup
+        .string()
+        .required(t("sign_up_password_required"))
+        .min(8, t("sign_up_password_min_length")),
+    })
+    .required();
+
+  type FormData = yup.InferType<typeof schema>;
+
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
@@ -56,7 +59,7 @@ const SignUpScreen = () => {
       );
       showMessage({
         type: "success",
-        message: "Account created successfully",
+        message: t("sign_up_success"),
       });
       navigation.navigate("MainAppBottomTabs");
       const userDataObj = {
@@ -66,13 +69,13 @@ const SignUpScreen = () => {
     } catch (error: any) {
       let errorMessage = "";
       if (error.code === "auth/email-already-in-use") {
-        errorMessage = "This email is already in use";
+        errorMessage = t("sign_up_error_email_in_use");
       } else if (error.code === "auth/invalid-email") {
-        errorMessage = "The email address is invalid";
+        errorMessage = t("sign_up_error_invalid_email");
       } else if (error.code === "auth/weak-password") {
-        errorMessage = "The password is too weak";
+        errorMessage = t("sign_up_error_weak_password");
       } else {
-        errorMessage = "An error occurred during sign-up";
+        errorMessage = t("sign_up_error_default");
       }
 
       showMessage({
@@ -87,26 +90,26 @@ const SignUpScreen = () => {
       <AppTextInputController
         control={control}
         name={"userName"}
-        placeholder="Enter Username"
+        placeholder={t("sign_up_username_placeholder")}
       />
       <AppTextInputController
         control={control}
         name={"email"}
-        placeholder="Enter Email"
+        placeholder={t("sign_up_email_placeholder")}
       />
       <AppTextInputController
         control={control}
         name={"password"}
-        placeholder="Enter Password"
+        placeholder={t("sign_up_password_placeholder")}
         secureTextEntry
       />
       <AppText style={styles.appName}>Smart E-Commerce</AppText>
       <AppButton
-        title={"Create Account"}
+        title={t("sign_up_create_account_button")}
         onPress={handleSubmit(onSignUpPress)}
       />
       <AppButton
-        title={"Go To Sign In"}
+        title={t("sign_up_goto_signin_button")}
         style={styles.signInButton}
         textColor={AppColors.primary}
         onPress={() => navigation.popToTop()} // instead of creating stack I used dismiss logic
