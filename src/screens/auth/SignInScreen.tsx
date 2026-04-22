@@ -50,7 +50,7 @@ const SignInScreen = () => {
         formData.email,
         formData.password,
       );
-      navigation.navigate("MainAppBottomTabs");
+      // navigation.navigate("MainAppBottomTabs");  commented as it is handled dynamically in mainAppStack not needed manually
       const userDataObj = {
         uid: userCredentials.user.uid,
       };

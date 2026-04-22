@@ -1,27 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
 import AppSafeView from "../../components/views/AppSafeView";
 import HomeHeader from "../../components/headers/HomeHeader";
 import ProfileSectionButton from "../../components/buttons/ProfileSectionButton";
 import { sharedPaddingHorizontal } from "../../styles/sharedStyles";
-import AppText from "../../components/texts/AppText";
-import { s, vs } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { SheetManager } from "react-native-actions-sheet";
 import LanguageBottomSheet from "../../components/language/LanguageBottomSheet";
 import { useTranslation } from "react-i18next";
-// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-// import { RootStackParamList } from "../../navigation/types";
-
-// type ProfileScreenNavigationProp =
-//   NativeStackNavigationProp<RootStackParamList>;
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth } from "../../config/firebase";
+import { signOut } from "@firebase/auth";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const { t } = useTranslation();
 
-  const handleLogout = () => {
-    // Add logout logic here
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userData");
+    await signOut(auth);
+    // navigation.navigate("AuthStack");   commented as it is handled dynamically in mainAppStack not needed manually
   };
 
   return (
